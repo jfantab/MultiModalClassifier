@@ -145,13 +145,16 @@ def main():
         print("No GPU and TPU enabled")
 
     img_shape=[3, args.img_height, args.img_width] #[channels, height, width] in pytorch
-    
+
     model_ft, model_classnames, numclasses, classmap = create_model(args.model_name, args.model_type, args.classmap, args.checkpoint, args.torchhub, device, img_shape)
-    model_ft.eval()
+    
+    model_ft_quant = torch.quantization.quantize_dynamic(model_ft, {nn.Conv2d}, dtype=torch.qint8)
+    
+    model_ft_quant.eval()
     
     newname="Sports Cars"#classmap['n04285008']
     image_path="/data/cmpe249-fa23/ImageClassData/tiny-imagenet-200/train/n04285008/images/n04285008_31.JPEG"#n04285008_497.JPEG"
-    inference_singleimage(image_path, model_ft, device, classnames=model_classnames, truelabel=newname, size=args.img_height, top_k=args.topk)
+    inference_singleimage(image_path, model_ft_quant, device, classnames=model_classnames, truelabel=newname, size=args.img_height, top_k=args.topk)
     
 
     #Load dataset
@@ -171,7 +174,7 @@ def main():
         matplotlib_imshow(img_grid, one_channel=False)
 
         #(batchsize, topk)
-        np_indices, np_probs, batchresults = inference_batchimage(images, model_ft, device, classnames=class_newnames, truelabel=labels, size=args.img_height, top_k=args.topk)
+        np_indices, np_probs, batchresults = inference_batchimage(images, model_ft_quant, device, classnames=class_newnames, truelabel=labels, size=args.img_height, top_k=args.topk)
 
         vistestresult(images, labels, np_indices[:,0], class_newnames, args.save_path)
         #save 'torchtestresultimage.png' under save_path
@@ -179,7 +182,7 @@ def main():
 
 
         #Start complete accuracy evaluation
-        test_loss, test_accuracy, labels, probs = test_model(model_ft, dataloaders, class_newnames, criterion, args.batchsize, key = 'val', device=device)
+        test_loss, test_accuracy, labels, probs = test_model(model_ft_quant, dataloaders, class_newnames, criterion, args.batchsize, key = 'val', device=device)
         print(f"Test Loss: {test_loss:.3f} | Test Acc: {test_accuracy:.2f}")
         plot_confusion_matrix(labels, probs)
 

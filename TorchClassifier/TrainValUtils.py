@@ -2,7 +2,7 @@ from enum import Enum
 import torch
 import torch.distributed as dist
 import matplotlib.pyplot as plt
-from TorchClassifier.Datasetutil.Visutil import imshow
+from Datasetutil.Visutil import imshow
 import numpy as np
 import time
 from tqdm import tqdm
@@ -61,6 +61,7 @@ def test_model(model, dataloaders, class_names, criterion, batch_size, key='test
     end = time.time()
     labels = []
     probs = []
+    results = []
     print("Total len of test loader:", len(test_loader))
     pbar = tqdm(desc='Evaluation:', total = len(test_loader))
     with torch.no_grad():
@@ -74,6 +75,7 @@ def test_model(model, dataloaders, class_names, criterion, batch_size, key='test
 
             # forward pass: compute predicted outputs by passing inputs to the model
             outputs = model(data)
+            results.append(outputs)
             if type(outputs) is tuple: #model may output multiple tensors as tuple
                 outputs, _ = outputs
             # calculate the batch loss
@@ -103,6 +105,10 @@ def test_model(model, dataloaders, class_names, criterion, batch_size, key='test
                     class_total[label] += 1
             
             pbar.update(1)
+
+            # Save evaluation results in checkpoints
+            if (batchindex > 0) and (batchindex % 1000 == 0):  # Every 1000 batches
+                torch.save(results, f"eval_checkpoint_{batchindex}.pt")
     
     labels = torch.cat(labels, dim = 0)
     probs = torch.cat(probs, dim = 0)
@@ -314,9 +320,9 @@ def postfilter(indices, probs, classnames=None, min_threshold=0.1):
         batchresults.append(topkresult)
     return batchresults
 
-from TorchClassifier.Datasetutil.Imagenetdata import loadjsontodict, dict2array, preprocess_image, preprocess_imagecv2
-from TorchClassifier.Datasetutil.Visutil import visfirstimageinbatch, plot_most_incorrect
-from TorchClassifier.myTorchModels.TorchCNNmodels import createTorchCNNmodel, createImageNetmodel
+from Datasetutil.Imagenetdata import loadjsontodict, dict2array, preprocess_image, preprocess_imagecv2
+from Datasetutil.Visutil import visfirstimageinbatch, plot_most_incorrect
+from myTorchModels.TorchCNNmodels import createTorchCNNmodel, createImageNetmodel
 import os
 def create_model(model_name, model_type, classmap, checkpoint=None, torchhub=None, device="cuda", img_shape=[2, 224, 224]):
     #Load class map

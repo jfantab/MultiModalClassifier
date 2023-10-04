@@ -4,6 +4,7 @@ import configargparse #pip install configargparse
 
 import torch
 import torch.nn as nn
+from torch.nn.utils import prune
 import torch.optim as optim
 from torch.optim import lr_scheduler
 import numpy as np
@@ -147,13 +148,15 @@ def main():
     img_shape=[3, args.img_height, args.img_width] #[channels, height, width] in pytorch
     
     model_ft, model_classnames, numclasses, classmap = create_model(args.model_name, args.model_type, args.classmap, args.checkpoint, args.torchhub, device, img_shape)
+    
+    prune.ln_structured(model_ft.layer4[2].conv3, name="weight", amount=0.8, n=2, dim=0)
+
     model_ft.eval()
     
     newname="Sports Cars"#classmap['n04285008']
     image_path="/data/cmpe249-fa23/ImageClassData/tiny-imagenet-200/train/n04285008/images/n04285008_31.JPEG"#n04285008_497.JPEG"
     inference_singleimage(image_path, model_ft, device, classnames=model_classnames, truelabel=newname, size=args.img_height, top_k=args.topk)
     
-
     #Load dataset
     dataloaders, dataset_sizes, dataset_classnames, img_shape = loadTorchdataset(args.data_name,args.data_type, args.data_path, args.img_height, args.img_width, args.batchsize)
     print("dataset_classnames:",dataset_classnames) #'n12768682' as names

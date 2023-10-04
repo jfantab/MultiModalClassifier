@@ -9,7 +9,7 @@ from torchvision.models import get_model, get_model_weights, get_weight, list_mo
 print(os.getcwd())
 
 #Download model
-os.environ['TORCH_HOME'] = '/data/cmpe249-fa22/torchhome/' #setting the environment variable
+os.environ['TORCH_HOME'] = '/scratch/cmpe249-fa23/torchhome/' #setting the environment variable
 resnet18 = torchvision.models.resnet18(pretrained=True)
 print(resnet18)
 resnet50 = torchvision.models.resnet50(pretrained=True)

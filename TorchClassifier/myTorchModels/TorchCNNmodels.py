@@ -7,7 +7,7 @@ import torchvision
 from torchvision import datasets, models, transforms
 import torch.nn.functional as F
 
-from TorchClassifier.myTorchModels.CustomResNet import setupCustomResNet
+from myTorchModels.CustomResNet import setupCustomResNet
 
 # Try to get torchinfo, install it if it doesn't work
 try:
@@ -45,7 +45,7 @@ model_names=list_models(module=torchvision.models)
 #                             'vgg11', 'vgg11_bn', 'vgg13', 'vgg13_bn', 'vgg16', 'vgg16_bn', 'vgg19', 'vgg19_bn', 'vit_b_16', 
 #                             'vit_b_32', 'vit_h_14', 'vit_l_16', 'vit_l_32', 'wide_resnet101_2', 'wide_resnet50_2']
 
-# from torchvision.models import get_model, get_model_weights, get_weight, list_models
+from torchvision.models import get_model, get_model_weights, get_weight, list_models
 def createImageNetmodel(model_name, torchhub=None):
     if model_name in model_names:
         # Step 1: Initialize model with the best available weights
@@ -55,7 +55,7 @@ def createImageNetmodel(model_name, torchhub=None):
         #weights = get_weight("ResNet50_Weights.IMAGENET1K_V2")#ResNet50_Weights.DEFAULT
         currentmodel=get_model(model_name, weights=weights)#weights="DEFAULT"
         #currentmodel.eval()
-        # Step 2: Initialize the inference transforms
+        # Step 2: Initialize the inference transformst
         preprocess = weights.transforms()#preprocess.crop_size
         classes = weights.meta["categories"]
         # Step 3: Apply inference preprocessing transforms
