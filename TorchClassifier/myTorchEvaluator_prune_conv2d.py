@@ -149,6 +149,21 @@ def main():
     
     model_ft, model_classnames, numclasses, classmap = create_model(args.model_name, args.model_type, args.classmap, args.checkpoint, args.torchhub, device, img_shape)
     
+    # Performing global unstructured pruning
+    '''
+    parameters_to_prune = [
+    (module, "weight") for module in filter(lambda m: type(m) == torch.nn.Conv2d, model_ft.modules())
+    ]
+
+    prune.global_unstructured(
+    parameters_to_prune,
+    pruning_method=prune.L1Unstructured,
+    amount=0.2,
+    )
+    '''
+
+    # Performing local structured pruning
+    # prune.ln_structured(model_ft.layer4[2].conv3, name="weight", amount=0.8, n=1, dim=0)
     prune.ln_structured(model_ft.layer4[2].conv3, name="weight", amount=0.8, n=2, dim=0)
 
     model_ft.eval()

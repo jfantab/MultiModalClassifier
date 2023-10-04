@@ -1,6 +1,9 @@
 # MultiModalClassifier
 This is a project repo for multi-modal deep learning classifier with popular models from Tensorflow and Pytorch. The goal of these baseline models is to provide a template to build on and can be a starting point for any new ideas, applications. If you want to learn basics of ML and DL, please refer this repo: https://github.com/lkk688/DeepDataMiningLearning.
 
+# Edits made
+In the repository, I edited the myTorchEvaluator.py file and made variants of it for pruning (myTorchEvaluator_prune_conv2d.py) and quantization (myTorchEvaluator_quantize_int8.py). I also added some code in TrainValUtils.py to save evaluation checkpoints if the execution was interrupted midway. Lastly, I added a script.sh Bash script to run the Python files.
+
 # Package setup
 Install this project in development mode
 ```bash

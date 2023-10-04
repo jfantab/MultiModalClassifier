@@ -148,6 +148,7 @@ def main():
 
     model_ft, model_classnames, numclasses, classmap = create_model(args.model_name, args.model_type, args.classmap, args.checkpoint, args.torchhub, device, img_shape)
     
+    # Performing quantization
     model_ft_quant = torch.quantization.quantize_dynamic(model_ft, {nn.Conv2d}, dtype=torch.qint8)
     
     model_ft_quant.eval()
